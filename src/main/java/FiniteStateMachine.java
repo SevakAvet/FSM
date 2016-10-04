@@ -3,7 +3,10 @@ import com.google.gson.GsonBuilder;
 import javafx.util.Pair;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by savetisyan on 20/09/16
@@ -15,63 +18,68 @@ public class FiniteStateMachine {
 
     private FiniteStateMachineConfig config;
 
-    private String currentState;
+    private Set<String> currentStates;
     private String start;
+
     private int processed = 0;
     private int maxSuccess = 0;
-    private boolean success = true;
+    private boolean success = false;
 
-    public FiniteStateMachine(FiniteStateMachineConfig config, String start) {
+    public FiniteStateMachine(FiniteStateMachineConfig config) {
         this.config = config;
-        this.start = start;
-        this.currentState = start;
+        this.currentStates = new HashSet<>();
     }
 
-    private FiniteStateMachine(FiniteStateMachineConfig config, String start, String currentState,
-                               int processed, int maxSuccess, boolean success) {
-        this.config = config;
+    private FiniteStateMachine(FiniteStateMachineConfig config, String start) {
+        this(config);
         this.start = start;
-        this.currentState = currentState;
-        this.processed = processed;
-        this.maxSuccess = maxSuccess;
-        this.success = success;
+        this.currentStates.add(start);
     }
 
-    public List<String> feed(String input) {
-        if (!success) {
-            return Collections.emptyList();
+    public Pair<Integer, Boolean> max(String input, int skip) {
+        return config.getStart().stream()
+                .map(start -> new FiniteStateMachine(config, start))
+                .map(x -> x.feed(input, skip))
+                .max(Comparator.comparing(Pair::getKey))
+                .orElse(new Pair<>(0, false));
+    }
+
+    private Pair<Integer, Boolean> feed(String input, int skip) {
+        input = input.substring(Math.min(skip, input.length()));
+        for (int i = 0; i < input.length(); i++) {
+            feed(String.valueOf(input.charAt(i)));
         }
 
-        Pair<String, String> state = new Pair<>(currentState, input);
-        List<String> nextState = config.getMatrix().getOrDefault(state, Collections.emptyList());
+        return maxSuccess != 0 ? new Pair<>(maxSuccess, true) : new Pair<>(0, false);
+    }
 
-        if (nextState.isEmpty()) {
-            success = false;
-        } else {
+    private void feed(String input) {
+        Set<String> nextStates = currentStates.stream()
+                .map(state -> new Pair<>(state, input))
+                .flatMap(state -> config.getMatrix().getOrDefault(state, Collections.emptyList()).stream())
+                .filter(states -> !states.isEmpty())
+                .collect(Collectors.toSet());
+
+        if (!nextStates.isEmpty()) {
+            success = true;
             processed++;
 
-            if (nextState.stream().anyMatch(x -> config.getFinish().contains(x))) {
+            if (nextStates.stream().anyMatch(x -> config.getFinish().contains(x))) {
                 maxSuccess = processed;
             }
-        }
 
-        return nextState;
+            currentStates = nextStates;
+        } else {
+            currentStates.clear();
+        }
     }
 
     public FiniteStateMachineConfig getConfig() {
         return config;
     }
 
-    public void setCurrentState(String currentState) {
-        this.currentState = currentState;
-    }
-
     public int getMaxSuccess() {
         return maxSuccess;
-    }
-
-    public String getCurrentState() {
-        return currentState;
     }
 
     public int getProcessed() {
@@ -91,13 +99,13 @@ public class FiniteStateMachine {
 
         if (processed != that.processed) return false;
         if (success != that.success) return false;
-        return currentState.equals(that.currentState);
+        return currentStates.equals(that.currentStates);
 
     }
 
     @Override
     public int hashCode() {
-        int result = currentState.hashCode();
+        int result = currentStates.hashCode();
         result = 31 * result + processed;
         result = 31 * result + (success ? 1 : 0);
         return result;
@@ -107,14 +115,10 @@ public class FiniteStateMachine {
     public String toString() {
         return "FiniteStateMachine{" +
                 "start='" + start + '\'' +
-                ", currentState='" + currentState + '\'' +
+                ", currentStates='" + currentStates + '\'' +
                 ", processed=" + processed +
                 ", success=" + success +
                 ", max_success=" + maxSuccess +
                 '}';
-    }
-
-    public FiniteStateMachine clone(String currentState) {
-        return new FiniteStateMachine(config, start, currentState, processed, maxSuccess, success);
     }
 }

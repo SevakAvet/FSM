@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
  * Created by savetisyan on 20/09/16
  */
 public class MatrixAdapter implements JsonDeserializer<FiniteStateMachineConfig> {
+
     @Override
     public FiniteStateMachineConfig deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
