@@ -1,0 +1,13 @@
+[
+  {
+    "start": ["q0"],
+    "finish": ["q1"],
+    "inputs": {
+      "whitespace": "x == '\\n' || x == '\\r' || x == '\\t' || x == ' '"
+    },
+    "matrix": {
+      "q0": {"whitespace": ["q1"]},
+      "q1": {"whitespace": ["q1"]}
+    }
+  }
+]

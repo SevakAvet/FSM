@@ -96,7 +96,7 @@ public class FiniteStateMachineConfig {
                         SCRIPT_ENGINE.put("x", state.getValue());
                         return (Boolean) SCRIPT_ENGINE.eval(inputs.get(x.getKey().getValue()));
                     } catch (ScriptException e) {
-                        return false;
+                        throw new IllegalArgumentException(e);
                     }
                 }).flatMap(x -> x.getValue().stream())
                 .collect(Collectors.toList());
