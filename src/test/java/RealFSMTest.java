@@ -3,6 +3,9 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 /**
  * Created by savetisyan on 10/10/16
  */
@@ -61,11 +64,11 @@ public class RealFSMTest {
 
     @Test(dataProvider = "positiveDataProvider")
     public void testPositive(String input) throws Exception {
-        Assert.assertTrue(fsm.max(input, 0).getKey() == input.length());
+        assertTrue(fsm.max(input).getKey() == input.length());
     }
 
     @Test(dataProvider = "negativeDataProvider")
     public void testNegative(String input) throws Exception {
-        Assert.assertFalse(fsm.max(input, 0).getKey() == input.length());
+        assertFalse(fsm.max(input).getKey() == input.length());
     }
 }

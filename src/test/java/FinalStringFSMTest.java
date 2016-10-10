@@ -3,6 +3,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 /**
  * Created by savetisyan on 10/10/16
  */
@@ -31,8 +34,8 @@ public class FinalStringFSMTest {
         Pair<Integer, Boolean> result = fsm.max("sevaksevak", 2);
         System.out.printf("(%d, %b)\n", result.getKey(), result.getValue());
 
-        Assert.assertTrue(result.getValue());
-        Assert.assertEquals(result.getKey().intValue(), 4);
+        assertTrue(result.getValue());
+        assertEquals(result.getKey().intValue(), 4);
     }
 
     @Test
@@ -47,7 +50,7 @@ public class FinalStringFSMTest {
         Pair<Integer, Boolean> result = fsm.max("sevak", 2);
         System.out.printf("(%d, %b)\n", result.getKey(), result.getValue());
 
-        Assert.assertTrue(result.getValue());
-        Assert.assertEquals(result.getKey().intValue(), 3);
+        assertTrue(result.getValue());
+        assertEquals(result.getKey().intValue(), 3);
     }
 }

@@ -29,6 +29,10 @@ public class FiniteStateMachine {
         this.currentStates.add(start);
     }
 
+    public Pair<Integer, Boolean> max(String input) {
+        return max(input, 0);
+    }
+
     public Pair<Integer, Boolean> max(String input, int skip) {
         return config.getStarts().stream()
                 .map(start -> new FiniteStateMachine(config, start))
