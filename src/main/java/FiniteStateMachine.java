@@ -1,8 +1,5 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javafx.util.Pair;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,10 +9,6 @@ import java.util.stream.Collectors;
  * Created by savetisyan on 20/09/16
  */
 public class FiniteStateMachine {
-    public static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(FiniteStateMachineConfig.class, new MatrixAdapter())
-            .create();
-
     private FiniteStateMachineConfig config;
 
     private Set<String> currentStates;
@@ -37,7 +30,7 @@ public class FiniteStateMachine {
     }
 
     public Pair<Integer, Boolean> max(String input, int skip) {
-        return config.getStart().stream()
+        return config.getStarts().stream()
                 .map(start -> new FiniteStateMachine(config, start))
                 .map(x -> x.feed(input, skip))
                 .max(Comparator.comparing(Pair::getKey))
@@ -45,8 +38,7 @@ public class FiniteStateMachine {
     }
 
     private Pair<Integer, Boolean> feed(String input, int skip) {
-        input = input.substring(Math.min(skip, input.length()));
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = Math.min(skip, input.length()); i < input.length(); i++) {
             feed(String.valueOf(input.charAt(i)));
         }
 
@@ -56,7 +48,7 @@ public class FiniteStateMachine {
     private void feed(String input) {
         Set<String> nextStates = currentStates.stream()
                 .map(state -> new Pair<>(state, input))
-                .flatMap(state -> config.getMatrix().getOrDefault(state, Collections.emptyList()).stream())
+                .flatMap(state -> config.nextState(state).stream())
                 .filter(states -> !states.isEmpty())
                 .collect(Collectors.toSet());
 
@@ -64,7 +56,7 @@ public class FiniteStateMachine {
             success = true;
             processed++;
 
-            if (nextStates.stream().anyMatch(x -> config.getFinish().contains(x))) {
+            if (nextStates.stream().anyMatch(x -> config.getFinishes().contains(x))) {
                 maxSuccess = processed;
             }
 

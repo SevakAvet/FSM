@@ -1,51 +1,141 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.util.Pair;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by savetisyan on 20/09/16
  */
 public class FiniteStateMachineConfig {
-    private Set<String> start;
-    private Set<String> finish;
+    public static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(FiniteStateMachineConfig.class, new ConfigDeserializer())
+            .create();
 
-    private Map<Pair<String, String>, List<String>> matrix;
+    private static final ScriptEngine SCRIPT_ENGINE = new NashornScriptEngineFactory().getScriptEngine();
 
-    public FiniteStateMachineConfig() {
+    private Set<String> starts;
+    private Set<String> finishes;
+    private Map<String, String> inputs;
+
+    private Map<Pair<String, String>, List<String>> charTransition;
+    private Map<Pair<String, String>, List<String>> functionTransitions;
+
+    private FiniteStateMachineConfig() {
     }
 
-    public Set<String> getStart() {
-        return start;
+    public static Builder builder() {
+        return new FiniteStateMachineConfig().new Builder();
     }
 
-    public void setStart(Set<String> start) {
-        this.start = start;
+    public class Builder {
+        private String fileName;
+
+        private Builder() {
+        }
+
+        public Builder fileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public Builder starts(Set<String> starts) {
+            FiniteStateMachineConfig.this.starts = starts;
+            return this;
+        }
+
+        public Builder finishes(Set<String> finishes) {
+            FiniteStateMachineConfig.this.finishes = finishes;
+            return this;
+        }
+
+        public Builder inputs(Map<String, String> inputs) {
+            FiniteStateMachineConfig.this.inputs = inputs;
+            return this;
+        }
+
+        public Builder chars(Map<Pair<String, String>, List<String>> chars) {
+            FiniteStateMachineConfig.this.charTransition = chars;
+            return this;
+        }
+
+        public Builder functions(Map<Pair<String, String>, List<String>> functions) {
+            FiniteStateMachineConfig.this.functionTransitions = functions;
+            return this;
+        }
+
+        public FiniteStateMachineConfig build() {
+            if (fileName != null) {
+                FileReader json;
+                try {
+                    json = new FileReader(fileName);
+                    return GSON.fromJson(json, FiniteStateMachineConfig.class);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return FiniteStateMachineConfig.this;
+        }
     }
 
-    public Set<String> getFinish() {
-        return finish;
+    public List<String> nextState(Pair<String, String> state) {
+        List<String> nextStates = charTransition.getOrDefault(state, Collections.emptyList());
+        if (!nextStates.isEmpty()) {
+            return nextStates;
+        }
+
+        nextStates = functionTransitions.entrySet().stream()
+                .filter(x -> x.getKey().getKey().equals(state.getKey()))
+                .filter(x -> {
+                    try {
+                        SCRIPT_ENGINE.put("x", state.getValue());
+                        return (Boolean) SCRIPT_ENGINE.eval(inputs.get(x.getKey().getValue()));
+                    } catch (ScriptException e) {
+                        return false;
+                    }
+                }).flatMap(x -> x.getValue().stream())
+                .collect(Collectors.toList());
+
+        if (!nextStates.isEmpty()) {
+            return nextStates;
+        }
+
+        return nextStates;
     }
 
-    public void setFinish(Set<String> finish) {
-        this.finish = finish;
+    public Set<String> getStarts() {
+        return starts;
     }
 
-    public Map<Pair<String, String>, List<String>> getMatrix() {
-        return matrix;
+    public Set<String> getFinishes() {
+        return finishes;
     }
 
-    public void setMatrix(Map<Pair<String, String>, List<String>> matrix) {
-        this.matrix = matrix;
+    public Map<String, String> getInputs() {
+        return inputs;
+    }
+
+    public Map<Pair<String, String>, List<String>> getCharTransition() {
+        return charTransition;
     }
 
     @Override
     public String toString() {
         return "FiniteStateMachineConfig{" +
-                "start=" + start +
-                ", finish=" + finish +
-                ", matrix=" + matrix +
+                "starts=" + starts +
+                ", finishes=" + finishes +
+                ", inputs=" + inputs +
+                ", charTransition=" + charTransition +
                 '}';
     }
 }
