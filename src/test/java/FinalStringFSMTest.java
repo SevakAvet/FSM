@@ -1,5 +1,4 @@
 import javafx.util.Pair;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

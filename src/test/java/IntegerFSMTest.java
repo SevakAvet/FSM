@@ -6,28 +6,30 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by savetisyan on 11/10/16
  */
-public class BoolFSMTest extends BaseFSMTest {
-    public BoolFSMTest() {
-        super("lex/bool.json");
+public class IntegerFSMTest extends BaseFSMTest {
+    public IntegerFSMTest() {
+        super("lex/integer.json");
     }
 
     @DataProvider
     public static Object[][] positiveDataProvider() {
         return new Object[][]{
-                {"#t", 2},
-                {"#f", 2},
-                {"#tasd", 2},
-                {"#fad", 2},
+                {"123", 3},
+                {"0000", 4},
+                {"+123123", 7},
+                {"-100092", 7},
+                {"+1askd", 2},
+                {"-111c", 4},
         };
     }
 
     @DataProvider
     public static Object[][] negativeDataProvider() {
         return new Object[][]{
-                {"oai#t", 0},
-                {"ebgin", 0},
-                {"vv#fal", 0},
-                {"f##fmin", 0},
+                {"oai11#t", 0},
+                {"eb2323gin", 0},
+                {"++23vv#fal", 0},
+                {"--000f##fmin", 0},
         };
     }
 
