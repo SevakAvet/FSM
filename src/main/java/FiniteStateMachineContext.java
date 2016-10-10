@@ -1,6 +1,5 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import javafx.util.Pair;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
@@ -8,7 +7,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +16,9 @@ import java.util.stream.Collectors;
 /**
  * Created by savetisyan on 20/09/16
  */
-public class FiniteStateMachineConfig {
+public class FiniteStateMachineContext {
     public static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(FiniteStateMachineConfig.class, new ConfigDeserializer())
+            .registerTypeAdapter(FiniteStateMachineContext.class, new ContextDeserializer())
             .create();
 
     private static final ScriptEngine SCRIPT_ENGINE = new NashornScriptEngineFactory().getScriptEngine();
@@ -32,54 +30,52 @@ public class FiniteStateMachineConfig {
     private Map<Pair<String, String>, List<String>> charTransition;
     private Map<Pair<String, String>, List<String>> functionTransitions;
 
-    private FiniteStateMachineConfig() {
+    private FiniteStateMachineContext() {
     }
 
     public static Builder builder() {
-        return new FiniteStateMachineConfig().new Builder();
+        return new FiniteStateMachineContext().new Builder();
     }
 
     public class Builder {
         private Builder() {
         }
 
-
         public Builder starts(Set<String> starts) {
-            FiniteStateMachineConfig.this.starts = starts;
+            FiniteStateMachineContext.this.starts = starts;
             return this;
         }
 
         public Builder finishes(Set<String> finishes) {
-            FiniteStateMachineConfig.this.finishes = finishes;
+            FiniteStateMachineContext.this.finishes = finishes;
             return this;
         }
 
         public Builder inputs(Map<String, String> inputs) {
-            FiniteStateMachineConfig.this.inputs = inputs;
+            FiniteStateMachineContext.this.inputs = inputs;
             return this;
         }
 
         public Builder chars(Map<Pair<String, String>, List<String>> chars) {
-            FiniteStateMachineConfig.this.charTransition = chars;
+            FiniteStateMachineContext.this.charTransition = chars;
             return this;
         }
 
         public Builder functions(Map<Pair<String, String>, List<String>> functions) {
-            FiniteStateMachineConfig.this.functionTransitions = functions;
+            FiniteStateMachineContext.this.functionTransitions = functions;
             return this;
         }
 
-        public FiniteStateMachineConfig build() {
-            return FiniteStateMachineConfig.this;
+        public FiniteStateMachineContext build() {
+            return FiniteStateMachineContext.this;
         }
     }
 
-    public static FiniteStateMachineConfig[] parse(String fileName) {
+    public static FiniteStateMachineContext[] parse(String fileName) {
         try (FileReader json = new FileReader(fileName)) {
-            Type itemsArrType = new TypeToken<FiniteStateMachineConfig[]>() {}.getType();
-            return GSON.fromJson(json, itemsArrType);
+            return GSON.fromJson(json, FiniteStateMachineContext[].class);
         } catch (IOException e) {
-            return null;
+            return new FiniteStateMachineContext[0];
         }
     }
 
@@ -91,14 +87,8 @@ public class FiniteStateMachineConfig {
 
         nextStates = functionTransitions.entrySet().stream()
                 .filter(x -> x.getKey().getKey().equals(state.getKey()))
-                .filter(x -> {
-                    try {
-                        SCRIPT_ENGINE.put("x", state.getValue());
-                        return (Boolean) SCRIPT_ENGINE.eval(inputs.get(x.getKey().getValue()));
-                    } catch (ScriptException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                }).flatMap(x -> x.getValue().stream())
+                .filter(x -> eval(state.getValue(), inputs.get(x.getKey().getValue())))
+                .flatMap(x -> x.getValue().stream())
                 .collect(Collectors.toList());
 
         if (!nextStates.isEmpty()) {
@@ -106,6 +96,15 @@ public class FiniteStateMachineConfig {
         }
 
         return nextStates;
+    }
+
+    private boolean eval(String var, String expression) {
+        try {
+            SCRIPT_ENGINE.put("x", var);
+            return (Boolean) SCRIPT_ENGINE.eval(expression);
+        } catch (ScriptException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public Set<String> getStarts() {

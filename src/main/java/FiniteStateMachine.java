@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * Created by savetisyan on 20/09/16
  */
 public class FiniteStateMachine {
-    private FiniteStateMachineConfig[] configs;
+    private FiniteStateMachineContext[] configs;
 
     private Set<String> currentStates;
     private String start;
@@ -19,24 +19,22 @@ public class FiniteStateMachine {
     private int maxSuccess = 0;
     private boolean success = false;
 
-    public FiniteStateMachine(FiniteStateMachineConfig config) {
-        this.configs = new FiniteStateMachineConfig[]{config};
+    public FiniteStateMachine(FiniteStateMachineContext config) {
+        this.configs = new FiniteStateMachineContext[]{config};
         this.currentStates = new HashSet<>();
     }
 
-    public FiniteStateMachine(FiniteStateMachineConfig config, String start) {
+    public FiniteStateMachine(FiniteStateMachineContext config, String start) {
         this(config);
         this.start = start;
         this.currentStates.add(start);
     }
 
-    public FiniteStateMachine(FiniteStateMachineConfig[] configs) {
+    public FiniteStateMachine(FiniteStateMachineContext[] configs) {
+        if (configs.length == 0) {
+            throw new IllegalArgumentException("Empty array of configs passed to constructor");
+        }
         this.configs = configs;
-    }
-
-    public FiniteStateMachine(FiniteStateMachineConfig[] configs, String start) {
-        this(configs);
-        this.start = start;
     }
 
     public Pair<Integer, Boolean> max(String input) {
@@ -54,7 +52,7 @@ public class FiniteStateMachine {
                 .orElse(new Pair<>(0, false));
     }
 
-    private Pair<Integer, Boolean> feed(FiniteStateMachineConfig config, String input, int skip) {
+    private Pair<Integer, Boolean> feed(FiniteStateMachineContext config, String input, int skip) {
         for (int i = Math.min(skip, input.length()); i < input.length(); i++) {
             feed(config, String.valueOf(input.charAt(i)));
         }
@@ -62,7 +60,7 @@ public class FiniteStateMachine {
         return maxSuccess != 0 ? new Pair<>(maxSuccess, true) : new Pair<>(0, false);
     }
 
-    private void feed(FiniteStateMachineConfig config, String input) {
+    private void feed(FiniteStateMachineContext config, String input) {
         Set<String> nextStates = currentStates.stream()
                 .map(state -> new Pair<>(state, input))
                 .flatMap(state -> config.nextState(state).stream())
@@ -83,7 +81,7 @@ public class FiniteStateMachine {
         }
     }
 
-    public FiniteStateMachineConfig[] getConfigs() {
+    public FiniteStateMachineContext[] getConfigs() {
         return configs;
     }
 

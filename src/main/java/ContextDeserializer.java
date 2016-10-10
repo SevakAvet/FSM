@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 /**
  * Created by savetisyan on 20/09/16
  */
-public class ConfigDeserializer implements JsonDeserializer<FiniteStateMachineConfig> {
+public class ContextDeserializer implements JsonDeserializer<FiniteStateMachineContext> {
 
     @Override
-    public FiniteStateMachineConfig deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+    public FiniteStateMachineContext deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
         Set<String> start = context.deserialize(json.getAsJsonArray("start"), HashSet.class);
         Set<String> finish = context.deserialize(json.getAsJsonArray("finish"), HashSet.class);
@@ -22,14 +22,12 @@ public class ConfigDeserializer implements JsonDeserializer<FiniteStateMachineCo
 
         Map<Boolean, Map<Pair<String, String>, List<String>>> collect = jsonMatrix.entrySet().stream()
                 .flatMap(x -> x.getValue().entrySet().stream()
-                        .map(y -> new Pair<>(new Pair<>(x.getKey(), y.getKey()), y.getValue())
-                        ))
+                        .map(y -> new Pair<>(new Pair<>(x.getKey(), y.getKey()), y.getValue())))
                 .collect(Collectors.groupingBy(
                         x -> inputs != null && inputs.keySet().contains(x.getKey().getValue()),
                         Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-
-        return FiniteStateMachineConfig.builder()
+        return FiniteStateMachineContext.builder()
                 .starts(start)
                 .finishes(finish)
                 .inputs(inputs)
