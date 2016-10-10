@@ -1,5 +1,4 @@
 import javafx.util.Pair;
-import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
@@ -9,16 +8,16 @@ import static org.testng.Assert.assertTrue;
 /**
  * Created by savetisyan on 10/10/16
  */
+@Test
 public class FinalStringFSMTest {
 
     private FiniteStateMachine fsm;
 
     @BeforeSuite
     public void setup() {
-        FiniteStateMachineConfig config =
-                FiniteStateMachineConfig.builder()
-                        .fileName(FiniteStateMachine.class.getResource("final_string.json").getFile())
-                        .build();
+        FiniteStateMachineConfig[] config =
+                FiniteStateMachineConfig.parse(
+                        FiniteStateMachine.class.getResource("final_string.json").getFile());
         fsm = new FiniteStateMachine(config);
     }
 

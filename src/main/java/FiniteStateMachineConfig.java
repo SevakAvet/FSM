@@ -1,12 +1,14 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import javafx.util.Pair;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -38,15 +40,9 @@ public class FiniteStateMachineConfig {
     }
 
     public class Builder {
-        private String fileName;
-
         private Builder() {
         }
 
-        public Builder fileName(String fileName) {
-            this.fileName = fileName;
-            return this;
-        }
 
         public Builder starts(Set<String> starts) {
             FiniteStateMachineConfig.this.starts = starts;
@@ -74,17 +70,16 @@ public class FiniteStateMachineConfig {
         }
 
         public FiniteStateMachineConfig build() {
-            if (fileName != null) {
-                FileReader json;
-                try {
-                    json = new FileReader(fileName);
-                    return GSON.fromJson(json, FiniteStateMachineConfig.class);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
             return FiniteStateMachineConfig.this;
+        }
+    }
+
+    public static FiniteStateMachineConfig[] parse(String fileName) {
+        try (FileReader json = new FileReader(fileName)) {
+            Type itemsArrType = new TypeToken<FiniteStateMachineConfig[]>() {}.getType();
+            return GSON.fromJson(json, itemsArrType);
+        } catch (IOException e) {
+            return null;
         }
     }
 

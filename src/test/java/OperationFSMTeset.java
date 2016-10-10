@@ -2,6 +2,8 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -9,15 +11,15 @@ import static org.testng.Assert.assertTrue;
 /**
  * Created by savetisyan on 10/10/16
  */
+@Test
 public class OperationFSMTeset {
     private FiniteStateMachine fsm;
 
     @BeforeSuite
     public void setup() {
-        FiniteStateMachineConfig config =
-                FiniteStateMachineConfig.builder()
-                        .fileName(FiniteStateMachine.class.getResource("lex/operation.json").getFile())
-                        .build();
+        FiniteStateMachineConfig[] config =
+                FiniteStateMachineConfig.parse(
+                        FiniteStateMachine.class.getResource("lex/operation.json").getFile());
         fsm = new FiniteStateMachine(config);
     }
 
