@@ -12,15 +12,10 @@ import static org.testng.Assert.assertTrue;
  * Created by savetisyan on 10/10/16
  */
 @Test
-public class OperationFSMTeset {
-    private FiniteStateMachine fsm;
+public class OperationFSMTest extends BaseFSMTest {
 
-    @BeforeSuite
-    public void setup() {
-        FiniteStateMachineConfig[] config =
-                FiniteStateMachineConfig.parse(
-                        FiniteStateMachine.class.getResource("lex/operation.json").getFile());
-        fsm = new FiniteStateMachine(config);
+    public OperationFSMTest() {
+        super("lex/operation.json");
     }
 
     @DataProvider

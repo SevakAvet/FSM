@@ -1,4 +1,4 @@
-import org.testng.annotations.BeforeSuite;
+import com.sun.xml.internal.rngom.parse.host.Base;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -7,30 +7,28 @@ import static org.testng.Assert.assertTrue;
 /**
  * Created by savetisyan on 11/10/16
  */
-public class KeywordFSMTest extends BaseFSMTest {
-
-    public KeywordFSMTest() {
-        super("lex/keyword.json");
+public class BoolFSMTest extends BaseFSMTest{
+    public BoolFSMTest() {
+        super("lex/bool.json");
     }
 
     @DataProvider
     public static Object[][] positiveDataProvider() {
         return new Object[][]{
-                {"begin", 5},
-                {"enddd", 3},
-                {"val", 3},
-                {"if", 2},
-                {"inn", 2},
+                {"#t", 2},
+                {"#f", 2},
+                {"#tasd", 2},
+                {"#fad", 2},
         };
     }
 
     @DataProvider
     public static Object[][] negativeDataProvider() {
         return new Object[][]{
-                {"not a key word", 0},
+                {"oai#t", 0},
                 {"ebgin", 0},
-                {"vval", 0},
-                {"min", 0},
+                {"vv#fal", 0},
+                {"f##fmin", 0},
         };
     }
 

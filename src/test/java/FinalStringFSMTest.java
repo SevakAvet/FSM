@@ -9,16 +9,10 @@ import static org.testng.Assert.assertTrue;
  * Created by savetisyan on 10/10/16
  */
 @Test
-public class FinalStringFSMTest {
+public class FinalStringFSMTest extends BaseFSMTest {
 
-    private FiniteStateMachine fsm;
-
-    @BeforeSuite
-    public void setup() {
-        FiniteStateMachineConfig[] config =
-                FiniteStateMachineConfig.parse(
-                        FiniteStateMachine.class.getResource("final_string.json").getFile());
-        fsm = new FiniteStateMachine(config);
+    public FinalStringFSMTest() {
+        super("final_string.json");
     }
 
     @Test

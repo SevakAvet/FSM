@@ -13,16 +13,10 @@ import static org.testng.Assert.assertTrue;
  * Created by savetisyan on 10/10/16
  */
 @Test
-public class RealFSMTest {
+public class RealFSMTest extends BaseFSMTest {
 
-    private FiniteStateMachine fsm;
-
-    @BeforeSuite
-    public void setup() {
-        FiniteStateMachineConfig[] config =
-                FiniteStateMachineConfig.parse(
-                        FiniteStateMachine.class.getResource("lex/real.json").getFile());
-        fsm = new FiniteStateMachine(config);
+    public RealFSMTest() {
+        super("lex/real.json");
     }
 
     @DataProvider
