@@ -1,0 +1,14 @@
+[
+  {
+    "start": ["q0"],
+    "finish": ["q1"],
+    "inputs": {
+      "terminal": "['c', 'd'].indexOf(x) >= 0"
+    },
+    "matrix": {
+      "q0": {
+        "terminal": ["q1"]
+      }
+    }
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "Terminal": {
+    "path": "/lexer/lr/example1/term.json",
+    "priority": 1
+  },
+  "NonTerminal": {
+    "path": "/lexer/lr/example1/nonterm.json",
+    "priority": 0
+  }
+}

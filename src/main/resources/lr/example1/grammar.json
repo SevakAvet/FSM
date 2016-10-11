@@ -1,0 +1,9 @@
+{
+  "nonterms": ["S", "C"],
+  "terms": ["c", "d"],
+  "start": "S",
+  "rules": {
+    "S": ["CC"],
+    "C": ["cC", "d"]
+  }
+}

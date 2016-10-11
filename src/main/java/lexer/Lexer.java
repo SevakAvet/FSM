@@ -1,6 +1,9 @@
 package lexer;
 
 import javafx.util.Pair;
+import lexer.Config;
+import lexer.entity.Entry;
+import lexer.entity.Token;
 import org.apache.tools.ant.util.FileUtils;
 
 import java.io.File;
@@ -15,13 +18,13 @@ import java.util.stream.Stream;
  * Created by savetisyan on 11/10/16
  */
 public class Lexer {
-    private LexerConfig config;
+    private Config config;
 
-    public Lexer(LexerConfig config) {
+    public Lexer(Config config) {
         this.config = config;
     }
 
-    public Stream<LexerToken> tokenize(File input) {
+    public Stream<Token> tokenize(File input) {
         try {
             return tokenize(FileUtils.readFully(new FileReader(input)));
         } catch (IOException e) {
@@ -29,12 +32,12 @@ public class Lexer {
         }
     }
 
-    public Stream<LexerToken> tokenize(String input) {
-        Stream.Builder<LexerToken> builder = Stream.builder();
+    public Stream<Token> tokenize(String input) {
+        Stream.Builder<Token> builder = Stream.builder();
         final int[] skip = new int[]{0};
 
         while (true) {
-            List<Pair<LexerEntry, Pair<Integer, Boolean>>> results = config.getEntries().stream()
+            List<Pair<Entry, Pair<Integer, Boolean>>> results = config.getEntries().stream()
                     .map(x -> new Pair<>(x, x.getMachine().max(input, skip[0])))
                     .collect(Collectors.toList());
 
@@ -47,13 +50,13 @@ public class Lexer {
                 break;
             }
 
-            LexerToken token = results.stream()
+            Token token = results.stream()
                     .filter(x -> x.getValue().equals(max))
                     .max((x, y) -> Integer.compare(x.getKey().getPriority(), y.getKey().getPriority()))
-                    .map(x -> new LexerToken(
+                    .map(x -> new Token(
                             x.getKey().getClassName(),
                             input.substring(skip[0], skip[0] + x.getValue().getKey())
-                    )).orElse(new LexerToken("", ""));
+                    )).orElse(new Token("", ""));
 
             if (token.getClassName().isEmpty()) {
                 break;
@@ -66,7 +69,7 @@ public class Lexer {
         return builder.build();
     }
 
-    public static LexerToken makeWhiteSpaceVisible(LexerToken token) {
+    public static Token makeWhiteSpaceVisible(Token token) {
         if (token.getClassName().equals("Whitespace")) {
             token.setValue(token.getValue()
                     .replace("\n", "\\n")
@@ -77,10 +80,4 @@ public class Lexer {
         }
         return token;
     }
-
-    public static void main(String[] args) {
-
-    }
-
-
 }

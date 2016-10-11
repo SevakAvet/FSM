@@ -1,13 +1,13 @@
-package lexer;
+package lexer.entity;
 
 /**
  * Created by savetisyan on 11/10/16
  */
-public class LexerToken {
+public class Token {
     private String className;
     private String value;
 
-    public LexerToken(String className, String value) {
+    public Token(String className, String value) {
         this.className = className;
         this.value = value;
     }

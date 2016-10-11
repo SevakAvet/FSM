@@ -1,0 +1,14 @@
+[
+  {
+    "start": ["q0"],
+    "finish": ["q1"],
+    "inputs": {
+      "nonterm": "['S', 'C'].indexOf(x) >= 0"
+    },
+    "matrix": {
+      "q0": {
+        "nonterm": ["q1"]
+      }
+    }
+  }
+]

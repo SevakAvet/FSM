@@ -13,6 +13,7 @@
         <gson.version>2.6.1</gson.version>
         <java.source.version>1.8</java.source.version>
         <java.target.version>1.8</java.target.version>
+        <asciitable.version>0.2.5</asciitable.version>
     </properties>
 
     <dependencies>
@@ -25,6 +26,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
+        </dependency>
+        <dependency>
+                <groupId>de.vandermeer</groupId>
+                <artifactId>asciitable</artifactId>
+                <version>${asciitable.version}</version>
         </dependency>
     </dependencies>
 

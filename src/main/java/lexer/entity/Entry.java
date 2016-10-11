@@ -1,16 +1,16 @@
-package lexer;
+package lexer.entity;
 
 import fsm.FiniteStateMachine;
 
 /**
  * Created by savetisyan on 11/10/16
  */
-public class LexerEntry {
+public class Entry {
     private String className;
     private FiniteStateMachine machine;
     private int priority;
 
-    public LexerEntry(String className, FiniteStateMachine machine, int priority) {
+    public Entry(String className, FiniteStateMachine machine, int priority) {
         this.className = className;
         this.machine = machine;
         this.priority = priority;

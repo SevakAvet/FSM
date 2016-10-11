@@ -1,7 +1,7 @@
 package com.sevak_avet.lexer;
 
 import lexer.Lexer;
-import lexer.LexerConfig;
+import lexer.Config;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -15,7 +15,7 @@ public class LexerTest {
     public void test() throws Exception {
         String file = Lexer.class.getResource("/lexer/lexer.json").getFile();
 
-        LexerConfig config = LexerConfig.parse(file);
+        Config config = Config.parse(file);
         File input = new File(LexerTest.class.getResource("/lexer_test.txt").getFile());
         new Lexer(config)
                 .tokenize(input)
