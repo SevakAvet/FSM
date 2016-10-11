@@ -3,7 +3,7 @@
     "start": ["q0"],
     "finish": ["q1"],
     "inputs": {
-      "nonterm": "['E', 'F', 'T'].indexOf(x) >= 0"
+      "nonterm": "['E', 'T', 'F'].indexOf(x) >= 0"
     },
     "matrix": {
       "q0": {

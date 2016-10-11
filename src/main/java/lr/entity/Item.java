@@ -57,8 +57,7 @@ public class Item {
     }
 
 
-    @Override
-    public String toString() {
+    public StringBuilder ruleWithDot() {
         StringBuilder sb = new StringBuilder("[");
         sb.append(rule.getLeft());
         sb.append(" -> ");
@@ -73,8 +72,13 @@ public class Item {
         } else {
             rightPart.append(".");
         }
-
         sb.append(rightPart);
+        return sb;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = ruleWithDot();
         sb.append(", ").append(lookahead.equals(LR1.END_OF_FILE) ? "$" : lookahead).append("]");
         return sb.toString();
     }

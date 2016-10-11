@@ -7,6 +7,7 @@ import lexer.Lexer;
 import lexer.entity.Token;
 import lr.Grammar;
 import lr.LR1;
+import lr.Utils;
 import lr.entity.*;
 import org.apache.tools.ant.util.FileUtils;
 import org.testng.annotations.Test;
@@ -40,14 +41,11 @@ public class GrammarTest {
 
         LR1 lr = new LR1(grammar);
 
-        ArrayList<Component> components = new ArrayList<>(lr.items());
-        Collections.sort(components, (o1, o2) -> o1.getId().compareTo(o2.getId()));
-        components.forEach(x -> System.out.println(x.getId() + " " + x.getItems()));
+        Utils.printCombinedItems(lr.items());
 
         CanonicalTable canonicalTable = lr.getTable();
-        canonicalTable.prettyPrint();
-
-        List<Token> input = lexer.tokenize("(i+i)*(i)").collect(Collectors.toList());
+        System.out.println(canonicalTable.prettyPrint());
+        List<Token> input = lexer.tokenize("i*(i+i)").collect(Collectors.toList());
 
         List<Rule> rules = lr.rulesSequence(input);
         System.out.println(rules);
