@@ -10,8 +10,8 @@ public abstract class BaseFSMTest {
     protected FiniteStateMachine fsm;
 
     public BaseFSMTest(String fileName) {
-        FiniteStateMachineContext[] config =
-                FiniteStateMachineContext.parse(FiniteStateMachine.class.getResource(fileName).getFile());
+        String file = FiniteStateMachine.class.getResource(fileName).getFile();
+        FiniteStateMachineContext[] config = FiniteStateMachineContext.parse(file);
         fsm = new FiniteStateMachine(config);
     }
 }
