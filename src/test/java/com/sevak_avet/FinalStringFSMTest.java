@@ -1,3 +1,5 @@
+package com.sevak_avet;
+
 import javafx.util.Pair;
 import org.testng.annotations.Test;
 

@@ -1,14 +1,16 @@
+package com.sevak_avet.lexer;
+
+import com.sevak_avet.BaseFSMTest;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Created by savetisyan on 11/10/16
  */
 public class IntegerFSMTest extends BaseFSMTest {
     public IntegerFSMTest() {
-        super("lex/integer.json");
+        super("/lexer/integer.json");
     }
 
     @DataProvider
@@ -35,11 +37,11 @@ public class IntegerFSMTest extends BaseFSMTest {
 
     @Test(dataProvider = "positiveDataProvider")
     public void testPositive(String input, int expectedLength) throws Exception {
-        assertEquals(fsm.max(input).getKey().intValue(), expectedLength);
+        Assert.assertEquals(fsm.max(input).getKey().intValue(), expectedLength);
     }
 
     @Test(dataProvider = "negativeDataProvider")
     public void testNegative(String input, int expectedLength) throws Exception {
-        assertEquals(fsm.max(input).getKey().intValue(), expectedLength);
+        Assert.assertEquals(fsm.max(input).getKey().intValue(), expectedLength);
     }
 }

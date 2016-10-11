@@ -1,3 +1,5 @@
+package fsm;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javafx.util.Pair;

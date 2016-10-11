@@ -1,0 +1,26 @@
+{
+  "Boolean": {
+    "path": "/lexer/bool.json",
+    "priority": 1
+  },
+  "Integer": {
+    "path": "/lexer/integer.json",
+    "priority": 1
+  },
+  "Keyword": {
+    "path": "/lexer/keyword.json",
+    "priority": 1
+  },
+  "Operation": {
+    "path": "/lexer/operation.json",
+    "priority": 1
+  },
+  "Double": {
+    "path": "/lexer/real.json",
+    "priority": 1
+  },
+  "Whitespace": {
+    "path": "/lexer/whitespace.json",
+    "priority": 0
+  }
+}

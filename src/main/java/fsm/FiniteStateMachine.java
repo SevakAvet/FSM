@@ -1,3 +1,5 @@
+package fsm;
+
 import javafx.util.Pair;
 
 import java.util.Arrays;
@@ -120,7 +122,7 @@ public class FiniteStateMachine {
 
     @Override
     public String toString() {
-        return "FiniteStateMachine{" +
+        return "fsm.FiniteStateMachine{" +
                 "start='" + start + '\'' +
                 ", currentStates='" + currentStates + '\'' +
                 ", processed=" + processed +

@@ -1,3 +1,8 @@
+package com.sevak_avet;
+
+import fsm.FiniteStateMachine;
+import fsm.FiniteStateMachineContext;
+
 /**
  * Created by savetisyan on 11/10/16
  */

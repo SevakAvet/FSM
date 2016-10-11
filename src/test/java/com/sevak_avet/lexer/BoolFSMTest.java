@@ -1,3 +1,6 @@
+package com.sevak_avet.lexer;
+
+import com.sevak_avet.BaseFSMTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -8,7 +11,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class BoolFSMTest extends BaseFSMTest {
     public BoolFSMTest() {
-        super("lex/bool.json");
+        super("/lexer/bool.json");
     }
 
     @DataProvider

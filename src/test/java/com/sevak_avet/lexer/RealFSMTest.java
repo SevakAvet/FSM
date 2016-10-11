@@ -1,3 +1,6 @@
+package com.sevak_avet.lexer;
+
+import com.sevak_avet.BaseFSMTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -11,7 +14,7 @@ import static org.testng.Assert.assertTrue;
 public class RealFSMTest extends BaseFSMTest {
 
     public RealFSMTest() {
-        super("lex/real.json");
+        super("/lexer/real.json");
     }
 
     @DataProvider
