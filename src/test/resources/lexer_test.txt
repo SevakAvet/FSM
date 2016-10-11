@@ -1,0 +1,10 @@
+begin
+val a = 1
+val b = 2
+
+while a + b<100 <==> */ >>>>b #t##t
+    if a > 50
+        a = a + 1.001e+6 +100. +100e+2
+    else
+        b = b + 2
+end

@@ -1,7 +1,11 @@
 package lexer;
 
 import javafx.util.Pair;
+import org.apache.tools.ant.util.FileUtils;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +19,14 @@ public class Lexer {
 
     public Lexer(LexerConfig config) {
         this.config = config;
+    }
+
+    public Stream<LexerToken> tokenize(File input) {
+        try {
+            return tokenize(FileUtils.readFully(new FileReader(input)));
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public Stream<LexerToken> tokenize(String input) {
@@ -67,12 +79,7 @@ public class Lexer {
     }
 
     public static void main(String[] args) {
-        String file = Lexer.class.getResource("/lexer/lexer.json").getFile();
-        LexerConfig config = LexerConfig.parse(file);
-        new Lexer(config)
-                .tokenize("begin \n\n while 123 #t#f#f 1e987 + 123")
-                .map(Lexer::makeWhiteSpaceVisible)
-                .forEach(System.out::println);
+
     }
 
 

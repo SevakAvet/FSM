@@ -1,4 +1,12 @@
 {
+  "Keyword": {
+    "path": "/lexer/keyword.json",
+    "priority": 3
+  },
+  "Id": {
+    "path": "/lexer/id.json",
+    "priority": 2
+  },
   "Boolean": {
     "path": "/lexer/bool.json",
     "priority": 1
@@ -7,16 +15,12 @@
     "path": "/lexer/integer.json",
     "priority": 1
   },
-  "Keyword": {
-    "path": "/lexer/keyword.json",
+  "Double": {
+    "path": "/lexer/real.json",
     "priority": 1
   },
   "Operation": {
     "path": "/lexer/operation.json",
-    "priority": 1
-  },
-  "Double": {
-    "path": "/lexer/real.json",
     "priority": 1
   },
   "Whitespace": {
