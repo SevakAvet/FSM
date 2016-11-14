@@ -10,13 +10,15 @@ import java.util.List;
  */
 public class SyntaxTree {
     private Node root;
+    private List<Rule> appliedRules;
 
-    public void setRoot(Node root) {
+    public SyntaxTree(Node root) {
         this.root = root;
     }
 
-    public Node getRoot() {
-        return root;
+    public SyntaxTree(Node root, List<Rule> appliedRules) {
+        this(root);
+        this.appliedRules = appliedRules;
     }
 
     public static class Node {
@@ -38,6 +40,10 @@ public class SyntaxTree {
             return value;
         }
 
+        private void setValue(Token value) {
+            this.value = value;
+        }
+
         public List<Node> getChilds() {
             return childs;
         }
@@ -53,6 +59,18 @@ public class SyntaxTree {
         public int getId() {
             return id;
         }
+    }
+
+    public void setRoot(Node root) {
+        this.root = root;
+    }
+
+    public Node getRoot() {
+        return root;
+    }
+
+    public List<Rule> getAppliedRules() {
+        return appliedRules;
     }
 
     public StringBuilder prettyPrint() {

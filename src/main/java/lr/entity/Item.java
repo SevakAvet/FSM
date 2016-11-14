@@ -68,7 +68,11 @@ public class Item {
         }
 
         if (dotPosition < rule.getRight().size()) {
-            rightPart.insert(dotPosition, ".");
+            int pos = 0;
+            for (int i = 0; i < dotPosition; i++) {
+                pos += rule.getRight().get(i).getValue().length();
+            }
+            rightPart.insert(pos, ".");
         } else {
             rightPart.append(".");
         }

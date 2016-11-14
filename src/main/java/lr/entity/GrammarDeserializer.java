@@ -5,7 +5,6 @@ import lexer.Lexer;
 import lr.Grammar;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +32,9 @@ public class GrammarDeserializer implements JsonDeserializer<Grammar> {
         List<Rule> rules = rulesJson.entrySet().stream()
                 .flatMap(x -> x.getValue().stream()
                         .map(rule ->
-                                new Rule(x.getKey(), lexer.tokenize(rule).collect(Collectors.toList()))))
+                                new Rule(x.getKey(), lexer.tokenize(rule)
+                                        .filter(z -> !z.getClassName().equals("Whitespace"))
+                                        .collect(Collectors.toList()))))
                 .collect(Collectors.toList());
         grammar.setRules(rules);
 

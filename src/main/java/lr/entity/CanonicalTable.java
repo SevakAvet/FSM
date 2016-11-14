@@ -59,6 +59,7 @@ public class CanonicalTable {
         row[grammar.getTerms().size() + 1] = "$";
         columnMapping.put("$", grammar.getTerms().size() + 1);
         columnMapping.put("\n", grammar.getTerms().size() + 1);
+        columnMapping.put("END", grammar.getTerms().size() + 1);
 
         for (int i = 1; i <= grammar.getTerms().size(); i++) {
             row[i] = grammar.getTerms().get(i - 1);
@@ -92,7 +93,7 @@ public class CanonicalTable {
 
         V2_AsciiTableRenderer rend = new V2_AsciiTableRenderer();
         rend.setTheme(V2_E_TableThemes.UTF_LIGHT.get());
-        rend.setWidth(new WidthAbsoluteEven(100));
+        rend.setWidth(new WidthAbsoluteEven(150));
         return rend.render(table).toString();
     }
 

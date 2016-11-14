@@ -1,0 +1,10 @@
+begin
+    val a = 1
+    val b = 2
+
+    while a <= b and #t
+        val c =
+            let val d = a + b
+            in 1 + 2
+            end
+end

@@ -1,0 +1,113 @@
+{
+  "Id": {
+    "path": "/lexer/id.json",
+    "priority": 1
+  },
+  "Integer": {
+    "path": "/lexer/integer.json",
+    "priority": 1
+  },
+  "Boolean": {
+    "path": "/lexer/bool.json",
+    "priority": 1
+  },
+  "Double": {
+    "path": "/lexer/real.json",
+    "priority": 1
+  },
+  "Operation": {
+    "path": "/lexer/operation.json",
+    "priority": 2
+  },
+  "Whitespace": {
+    "path": "/lexer/whitespace.json",
+    "priority": 0
+  },
+  "LP": {
+    "path": "/lexer/lr/example3/lp.json",
+    "priority": 3
+  },
+  "RP": {
+    "path": "/lexer/lr/example3/rp.json",
+    "priority": 3
+  },
+  "begin": {
+    "path": "/lexer/lr/example3/begin.json",
+    "priority": 3
+  },
+  "val": {
+    "path": "/lexer/lr/example3/val.json",
+    "priority": 3
+  },
+  "while": {
+    "path": "/lexer/lr/example3/while.json",
+    "priority": 3
+  },
+  "end": {
+    "path": "/lexer/lr/example3/end.json",
+    "priority": 3
+  },
+  "let": {
+    "path": "/lexer/lr/example3/let.json",
+    "priority": 3
+  },
+  "in": {
+    "path": "/lexer/lr/example3/in.json",
+    "priority": 3
+  },
+  "if": {
+    "path": "/lexer/lr/example3/if.json",
+    "priority": 3
+  },
+  "then": {
+    "path": "/lexer/lr/example3/then.json",
+    "priority": 3
+  },
+  "else": {
+    "path": "/lexer/lr/example3/else.json",
+    "priority": 3
+  },
+
+  "assign": {
+    "path": "/lexer/lr/example3/assign.json",
+    "priority": 5
+  },
+
+  "eq": {
+    "path": "/lexer/lr/example3/eq.json",
+    "priority": 4
+  },
+  "neq": {
+    "path": "/lexer/lr/example3/neq.json",
+    "priority": 4
+  },
+  "gt": {
+    "path": "/lexer/lr/example3/gt.json",
+    "priority": 4
+  },
+  "gte": {
+    "path": "/lexer/lr/example3/gte.json",
+    "priority": 4
+  },
+  "lw": {
+    "path": "/lexer/lr/example3/lw.json",
+    "priority": 4
+  },
+  "lwe": {
+    "path": "/lexer/lr/example3/lwe.json",
+    "priority": 4
+  },
+
+  "or": {
+    "path": "/lexer/lr/example3/or.json",
+    "priority": 3
+  },
+  "not": {
+    "path": "/lexer/lr/example3/not.json",
+    "priority": 3
+  },
+  "and": {
+    "path": "/lexer/lr/example3/and.json",
+    "priority": 3
+  }
+}

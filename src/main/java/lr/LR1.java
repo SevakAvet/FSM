@@ -16,7 +16,7 @@ import static lr.entity.SyntaxTree.Node;
  * Created by savetisyan on 23/10/16
  */
 public class LR1 {
-    public static final String END_OF_FILE = "\n";
+    public static final String END_OF_FILE = "END";
     private Map<String, Set<String>> firstCache = new HashMap<>();
     private CanonicalTable table;
     private Grammar grammar;
@@ -36,91 +36,52 @@ public class LR1 {
     }
 
     public SyntaxTree buildTree(List<Token> inputs) {
-        List<Rule> rules = rulesSequence(inputs);
-
-        AtomicInteger nodeId = new AtomicInteger(0);
-        SyntaxTree tree = new SyntaxTree();
-        Node root = new Node(rules.get(0).getLeft(), nodeId.getAndIncrement());
-        List<Token> childs = rules.get(0).getRight();
-        tree.setRoot(root);
-
-        List<Node> currentChilds = new ArrayList<>();
-        for (Token child : childs) {
-            Node node = new Node(child, nodeId.getAndIncrement());
-            currentChilds.add(node);
-            root.addChild(node);
+        if (!inputs.get(inputs.size() - 1).getClassName().equals(END_OF_FILE)) {
+            inputs.add(new Token(END_OF_FILE, END_OF_FILE));
         }
-
-        int ruleId = 1;
-        while (true) {
-            List<Node> newChilds = new ArrayList<>();
-            Rule rule = rules.get(ruleId);
-
-            boolean stop = false;
-            int stoppedOn = -1;
-            for (int j = currentChilds.size() - 1; j >= 0; j--) {
-                Node currentChild = currentChilds.get(j);
-
-                if (currentChild.getValue().getValue().equals(rule.getLeft())) {
-                    List<Node> childToAdd = rule.getRight()
-                            .stream()
-                            .map(x -> new Node(x, nodeId.getAndIncrement()))
-                            .collect(Collectors.toList());
-
-                    newChilds.addAll(childToAdd);
-                    currentChild.addChilds(childToAdd);
-
-                    stoppedOn = j;
-                    if (ruleId + 1 >= rules.size()) {
-                        stop = true;
-                    } else {
-                        ruleId++;
-                    }
-
-                    break;
-                }
-            }
-
-            currentChilds.remove(stoppedOn);
-            currentChilds.addAll(stoppedOn, newChilds);
-
-            if (stop) {
-                break;
-            }
-        }
-
-        return tree;
-    }
-
-    public List<Rule> rulesSequence(List<Token> inputs) {
-        if (!inputs.get(inputs.size() - 1).getValue().equals(END_OF_FILE)) {
-            inputs.add(new Token("", END_OF_FILE));
-        }
-
-        Stack<Component> stack = new Stack<>();
-        stack.push(getComponent(0));
 
         List<Rule> appliedRules = new ArrayList<>();
+        Stack<Component> stack = new Stack<>();
+        Stack<Node> subtree = new Stack<>();
+        stack.push(getComponent(0));
 
         int curPos = 0;
         boolean accept = false;
         while (!accept) {
-            String symbol = inputs.get(curPos).getValue();
+            String symbol = inputs.get(curPos).getClassName();
 
             Component peek = stack.peek();
             Action action = table.get(peek, symbol);
+            int nodeId = 1;
 
             switch (action.getActionType()) {
                 case SHIFT:
                     stack.push(action.getTo());
+                    subtree.push(new Node(inputs.get(curPos), nodeId++));
                     curPos++;
                     break;
                 case REDUCE:
                     Rule rule = action.getReduceRule();
                     appliedRules.add(rule);
-                    int tokensToRemove = rule.getRight().size();
-                    for (int i = 0; i < tokensToRemove; i++) {
+                    List<Token> right = rule.getRight();
+
+                    for (int i = 0; i < right.size(); i++) {
                         stack.pop();
+                    }
+
+                    if (subtree.isEmpty()) {
+                        Node root = new Node(rule.getLeft(), nodeId++);
+                        root.addChild(subtree.pop());
+                        subtree.push(root);
+                    } else {
+                        Node node = new Node(rule.getLeft(), nodeId++);
+                        List<Node> childs = new ArrayList<>();
+                        for (int i = 0; i < right.size(); i++) {
+                            childs.add(subtree.pop());
+                        }
+                        Collections.reverse(childs);
+                        node.addChilds(childs);
+                        subtree.push(node);
                     }
 
                     peek = stack.peek();
@@ -136,7 +97,7 @@ public class LR1 {
         }
 
         Collections.reverse(appliedRules);
-        return appliedRules;
+        return new SyntaxTree(subtree.pop(), appliedRules);
     }
 
     public CanonicalTable getTable() {
@@ -158,11 +119,11 @@ public class LR1 {
                             continue;
                         }
 
-                        if (grammar.getTerms().contains(token.getValue())) {
-                            Set<Item> newComponent = goTo(component, token.getValue());
+                        if (grammar.getTerms().contains(token.getClassName())) {
+                            Set<Item> newComponent = goTo(component, token.getClassName());
                             Component to = getComponent(this.components, newComponent);
                             if (to != null) {
-                                canonicalTable.add(component, token.getValue(), new Action(SHIFT, to));
+                                canonicalTable.add(component, token.getClassName(), new Action(SHIFT, to));
                             }
                         }
 
@@ -218,7 +179,7 @@ public class LR1 {
 
                 List<String> tokens = rightPart.getBetta()
                         .stream()
-                        .map(Token::getValue)
+                        .map(Token::getClassName)
                         .collect(Collectors.toList());
                 tokens.add(rightPart.getA());
                 if (tokens.isEmpty()) {
@@ -260,7 +221,12 @@ public class LR1 {
             List<Token> right = item.getRule().getRight();
             String symbol = "";
             if (item.getDotPosition() < right.size()) {
-                symbol = right.get(item.getDotPosition()).getValue();
+                Token token = right.get(item.getDotPosition());
+
+                symbol = token.getClassName();
+                if (symbol.equals("NonTerminal")) {
+                    symbol = token.getValue();
+                }
             }
 
             if (symbol.equals(x)) {
@@ -403,18 +369,30 @@ public class LR1 {
                 .filter(rule -> rule.getLeft().equals(symbol))
                 .forEach(rule -> {
                     List<Token> right = rule.getRight();
-                    Set<String> firstSet = first(right.get(0).getValue());
-                    firstSet.remove("");
-                    first.addAll(firstSet);
+
+                    if(!right.get(0).getValue().equals(symbol)) {
+                        Set<String> firstSet = first(right.get(0).getValue());
+                        firstSet.remove("");
+                        first.addAll(firstSet);
+                    }
 
                     int i = 0;
-                    while (i < right.size() - 1 && first(right.get(i).getValue()).contains("")) {
+                    while (i < right.size() - 1) {
+                        if(right.get(i).getValue().equals(symbol)) {
+                            i++;
+                            continue;
+                        }
+
+                        if(!first(right.get(i).getValue()).contains("")) {
+                            break;
+                        }
+
                         if (i == right.size() - 2 && first(right.get(i + 1).getValue()).contains("")) {
                             first.add("");
                             break;
                         }
 
-                        firstSet = first(right.get(i + 1).getValue());
+                        Set<String> firstSet = first(right.get(i + 1).getValue());
                         firstSet.remove("");
                         first.addAll(firstSet);
                         ++i;

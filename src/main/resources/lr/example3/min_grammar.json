@@ -1,0 +1,10 @@
+{
+  "nonterms": ["P", "LE", "LOP"],
+  "terms": ["Boolean", "while","plus", "LP", "RP"],
+  "start": "P",
+  "rules": {
+    "P": ["while LE"],
+    "LOP": ["+"],
+    "LE": ["Boolean", "Boolean LOP LE", "(LE)"]
+  }
+}

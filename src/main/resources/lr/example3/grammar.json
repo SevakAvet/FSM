@@ -1,0 +1,21 @@
+{
+  "nonterms": ["P", "OP", "E", "LE", "LOP", "CONST", "CMP"],
+  "terms": ["Boolean", "Id", "Integer", "Double", "Operation", "LP", "RP",
+    "begin", "end", "val", "while", "let", "in",
+    "if", "then", "else",
+    "and", "or", "not", "assign",
+    "gt", "gte", "lw", "lwe", "eq", "neq"],
+
+  "start": "P",
+  "rules": {
+    "P": ["OP", "OP P"],
+    "OP": ["begin P end", "val Id = E", "while LE OP"],
+    "E": ["CONST", "Boolean", "(E)", "E Operation E",
+      "let P in E end", "if LE then E else E"],
+    "LOP": ["or", "and"],
+    "CONST": ["Id", "Integer", "Double"],
+    "CMP": ["<", "<=", ">", ">=", "==", "!="],
+    "LE": ["Boolean", "LE LOP LE", "(LE)", "not LE",
+      "Id CMP CONST", "Integer CMP CONST", "Double CMP CONST"]
+  }
+}
