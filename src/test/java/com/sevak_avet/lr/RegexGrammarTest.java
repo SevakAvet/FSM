@@ -7,7 +7,6 @@ import lexer.Lexer;
 import lexer.entity.Token;
 import lr.Grammar;
 import lr.LR1;
-import lr.Utils;
 import lr.entity.*;
 import org.apache.tools.ant.util.FileUtils;
 import org.testng.annotations.Test;
@@ -23,11 +22,11 @@ import java.util.stream.Collectors;
  * Created by savetisyan on 23/10/16
  */
 
-public class GrammarTest {
+public class RegexGrammarTest {
 
     @Test
     public void testName() throws Exception {
-        String file = Lexer.class.getResource("/lexer/lr/example3/lexer.json").getFile();
+        String file = Lexer.class.getResource("/lexer/lr/example5/regex_grammar.json").getFile();
         Config config = Config.parse(file);
         Lexer syntaxRulesLexer = new Lexer(config);
         GrammarDeserializer deserializer = new GrammarDeserializer(syntaxRulesLexer);
@@ -39,7 +38,7 @@ public class GrammarTest {
         String json = FileUtils.readFully(new FileReader(file));
         Grammar grammar = gson.fromJson(json, Grammar.class);
 
-        file = Lexer.class.getResource("/lexer/lr/example4/lexer.json").getFile();
+        file = Lexer.class.getResource("/lexer/lr/example5/regex_input.json").getFile();
         config = Config.parse(file);
         Lexer lexer = new Lexer(config);
         System.out.println(grammar);
@@ -63,7 +62,7 @@ public class GrammarTest {
 
         SyntaxTree tree = lr.buildTree(input);
 //        List<Rule> rules = tree.getAppliedRules();
-//
+
 //        System.out.println(rules);
         System.out.println(tree.prettyPrint());
     }

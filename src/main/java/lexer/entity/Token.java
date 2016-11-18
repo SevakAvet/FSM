@@ -30,6 +30,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return className + ": \"" + value + "\"";
+        return String.format("(%s: \"%s\")", className, value);
     }
 }

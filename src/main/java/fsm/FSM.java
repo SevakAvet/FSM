@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 /**
  * Created by savetisyan on 20/09/16
  */
-public class FiniteStateMachine {
-    private FiniteStateMachineContext[] configs;
+public class FSM {
+    private FSMContext[] configs;
 
     private Set<String> currentStates;
     private String start;
@@ -21,18 +21,18 @@ public class FiniteStateMachine {
     private int maxSuccess = 0;
     private boolean success = false;
 
-    public FiniteStateMachine(FiniteStateMachineContext config) {
-        this.configs = new FiniteStateMachineContext[]{config};
+    public FSM(FSMContext config) {
+        this.configs = new FSMContext[]{config};
         this.currentStates = new HashSet<>();
     }
 
-    public FiniteStateMachine(FiniteStateMachineContext config, String start) {
+    public FSM(FSMContext config, String start) {
         this(config);
         this.start = start;
         this.currentStates.add(start);
     }
 
-    public FiniteStateMachine(FiniteStateMachineContext[] configs) {
+    public FSM(FSMContext[] configs) {
         if (configs.length == 0) {
             throw new IllegalArgumentException("Empty array of configs passed to constructor");
         }
@@ -46,7 +46,7 @@ public class FiniteStateMachine {
     public Pair<Integer, Boolean> max(String input, int skip) {
         return Arrays.stream(configs).map(config ->
                 config.getStarts().stream()
-                        .map(start -> new FiniteStateMachine(config, start))
+                        .map(start -> new FSM(config, start))
                         .map(x -> x.feed(config, input, skip))
                         .max(Comparator.comparing(Pair::getKey))
                         .orElse(new Pair<>(0, false)))
@@ -54,7 +54,7 @@ public class FiniteStateMachine {
                 .orElse(new Pair<>(0, false));
     }
 
-    private Pair<Integer, Boolean> feed(FiniteStateMachineContext config, String input, int skip) {
+    private Pair<Integer, Boolean> feed(FSMContext config, String input, int skip) {
         for (int i = Math.min(skip, input.length()); i < input.length(); i++) {
             feed(config, String.valueOf(input.charAt(i)));
         }
@@ -62,7 +62,7 @@ public class FiniteStateMachine {
         return maxSuccess != 0 ? new Pair<>(maxSuccess, true) : new Pair<>(0, false);
     }
 
-    private void feed(FiniteStateMachineContext config, String input) {
+    private void feed(FSMContext config, String input) {
         Set<String> nextStates = currentStates.stream()
                 .map(state -> new Pair<>(state, input))
                 .flatMap(state -> config.nextState(state).stream())
@@ -83,7 +83,7 @@ public class FiniteStateMachine {
         }
     }
 
-    public FiniteStateMachineContext[] getConfigs() {
+    public FSMContext[] getConfigs() {
         return configs;
     }
 
@@ -104,7 +104,7 @@ public class FiniteStateMachine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FiniteStateMachine that = (FiniteStateMachine) o;
+        FSM that = (FSM) o;
 
         if (processed != that.processed) return false;
         if (success != that.success) return false;

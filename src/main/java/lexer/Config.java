@@ -2,6 +2,7 @@ package lexer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lexer.deserializer.ConfigDeserializer;
 import lexer.entity.Entry;
 
 import java.io.FileReader;

@@ -1,0 +1,123 @@
+{
+  "Id": {
+    "regex": "\\w(\\w+\\d+_+')*+\\r\\r*",
+    "priority": 1,
+    "inputs": {
+      "\\r": "['>', '<', '!', '#', '+', '-', '*', '/', '&', '$', '@', '~'].indexOf(x) >= 0"
+    }
+  },
+  "Integer": {
+    "regex": "(\\++-+\\$)\\d\\d*",
+    "priority": 1
+  },
+  "Boolean": {
+    "regex": "#(t+f)",
+    "priority": 1
+  },
+  "Double": {
+    "regex": "(\\++-+\\$)((\\d\\d*.)+(.\\d\\d*)+(\\d\\d*.\\d\\d*)+(\\d\\d*))(\\e(\\++-)\\d\\d*+\\$)",
+    "priority": 1
+  },
+  "Operation": {
+    "regex": "<+>+=+\\++-+\\*+/+<>",
+    "priority": 2
+  },
+
+  "Whitespace": {
+    "regex": "\\s*",
+    "priority": 0
+  },
+
+  "LP": {
+    "regex": "\\(",
+    "priority": 3,
+    "inputs": {
+      "\\(": "x == '('"
+    }
+  },
+  "RP": {
+    "regex": "\\)",
+    "priority": 3,
+    "inputs": {
+      "\\)": "x == ')'"
+    }
+  },
+  "begin": {
+    "regex": "begin",
+    "priority": 3
+  },
+  "val": {
+    "regex": "val",
+    "priority": 3
+  },
+  "while": {
+    "regex": "while",
+    "priority": 3
+  },
+  "end": {
+    "regex": "end",
+    "priority": 3
+  },
+  "let": {
+    "regex": "let",
+    "priority": 3
+  },
+  "in": {
+    "regex": "in",
+    "priority": 3
+  },
+  "if": {
+    "regex": "if",
+    "priority": 3
+  },
+  "then": {
+    "regex": "then",
+    "priority": 3
+  },
+  "else": {
+    "regex": "else",
+    "priority": 3
+  },
+
+  "assign": {
+    "regex": "=",
+    "priority": 5
+  },
+
+  "eq": {
+    "regex": "==",
+    "priority": 4
+  },
+  "neq": {
+    "regex": "!=",
+    "priority": 4
+  },
+  "gt": {
+    "regex": ">",
+    "priority": 4
+  },
+  "gte": {
+    "regex": ">=",
+    "priority": 4
+  },
+  "lw": {
+    "regex": "<",
+    "priority": 4
+  },
+  "lwe": {
+    "regex": "<=",
+    "priority": 4
+  },
+  "or": {
+    "regex": "or",
+    "priority": 3
+  },
+  "not": {
+    "regex": "not",
+    "priority": 3
+  },
+  "and": {
+    "regex": "and",
+    "priority": 3
+  }
+}

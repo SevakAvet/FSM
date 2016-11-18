@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 /**
  * Created by savetisyan on 20/09/16
  */
-public class ContextDeserializer implements JsonDeserializer<FiniteStateMachineContext> {
+public class ContextDeserializer implements JsonDeserializer<FSMContext> {
 
     @Override
-    public FiniteStateMachineContext deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+    public FSMContext deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
         Set<String> start = context.deserialize(json.getAsJsonArray("start"), HashSet.class);
         Set<String> finish = context.deserialize(json.getAsJsonArray("finish"), HashSet.class);
@@ -22,19 +22,20 @@ public class ContextDeserializer implements JsonDeserializer<FiniteStateMachineC
         Map<String, Map<String, List<String>>> jsonMatrix =
                 context.deserialize(json.getAsJsonObject("matrix"), Map.class);
 
-        Map<Boolean, Map<Pair<String, String>, List<String>>> collect = jsonMatrix.entrySet().stream()
+        Map<Boolean, Map<Pair<String, String>, Set<String>>> collect = jsonMatrix.entrySet().stream()
                 .flatMap(x -> x.getValue().entrySet().stream()
-                        .map(y -> new Pair<>(new Pair<>(x.getKey(), y.getKey()), y.getValue())))
+                        .map(y -> new Pair<>(new Pair<>(x.getKey(), y.getKey()), new HashSet<>(y.getValue()))))
                 .collect(Collectors.groupingBy(
                         x -> inputs != null && inputs.keySet().contains(x.getKey().getValue()),
                         Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-        return FiniteStateMachineContext.builder()
-                .starts(start)
-                .finishes(finish)
-                .inputs(inputs)
-                .functions(collect.getOrDefault(true, Collections.emptyMap()))
-                .chars(collect.getOrDefault(false, Collections.emptyMap()))
-                .build();
+        FSMContext fsm = new FSMContext();
+        fsm.setStarts(start);
+        fsm.setFinishes(finish);
+        fsm.updateInputs(inputs);
+        fsm.setFunctionTransitions(collect.getOrDefault(true, Collections.emptyMap()));
+        fsm.setCharTransitions(collect.getOrDefault(false, Collections.emptyMap()));
+
+        return fsm;
     }
 }

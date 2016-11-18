@@ -1,0 +1,147 @@
+{
+  "Id": {
+    "regex": "Id",
+    "priority": 1
+  },
+  "Integer": {
+    "regex": "Integer",
+    "priority": 1
+  },
+  "Boolean": {
+    "regex": "Boolean",
+    "priority": 1
+  },
+  "Double": {
+    "regex": "Double",
+    "priority": 1
+  },
+  "Operation": {
+    "regex": "Operation",
+    "priority": 1
+  },
+
+  "Whitespace": {
+    "regex": "\\s*",
+    "priority": 0
+  },
+
+  "E": {
+    "regex": "E",
+    "priority": 4
+  },
+  "P": {
+    "regex": "P",
+    "priority": 4
+  },
+  "OP": {
+    "regex": "OP",
+    "priority": 4
+  },
+  "LE": {
+    "regex": "LE",
+    "priority": 4
+  },
+  "LOP": {
+    "regex": "LOP",
+    "priority": 4
+  },
+  "CMP": {
+    "regex": "CMP",
+    "priority": 4
+  },
+  "CONST": {
+    "regex": "CONST",
+    "priority": 4
+  },
+
+  "LP": {
+    "regex": "\\(",
+    "priority": 3,
+    "inputs": {
+      "\\(": "x == '('"
+    }
+  },
+  "RP": {
+    "regex": "\\)",
+    "priority": 3,
+    "inputs": {
+      "\\)": "x == ')'"
+    }
+  },
+  "begin": {
+    "regex": "begin",
+    "priority": 3
+  },
+  "val": {
+    "regex": "val",
+    "priority": 3
+  },
+  "while": {
+    "regex": "while",
+    "priority": 3
+  },
+  "end": {
+    "regex": "end",
+    "priority": 3
+  },
+  "let": {
+    "regex": "let",
+    "priority": 3
+  },
+  "in": {
+    "regex": "in",
+    "priority": 3
+  },
+  "if": {
+    "regex": "if",
+    "priority": 3
+  },
+  "then": {
+    "regex": "then",
+    "priority": 3
+  },
+  "else": {
+    "regex": "else",
+    "priority": 3
+  },
+  "or": {
+    "regex": "or",
+    "priority": 3
+  },
+  "not": {
+    "regex": "not",
+    "priority": 3
+  },
+  "and": {
+    "regex": "and",
+    "priority": 3
+  },
+  "assign": {
+    "regex": "=",
+    "priority": 5
+  },
+  "eq": {
+    "regex": "==",
+    "priority": 4
+  },
+  "neq": {
+    "regex": "!=",
+    "priority": 4
+  },
+  "gt": {
+    "regex": ">",
+    "priority": 4
+  },
+  "gte": {
+    "regex": ">=",
+    "priority": 4
+  },
+  "lw": {
+    "regex": "<",
+    "priority": 4
+  },
+  "lwe": {
+    "regex": "<=",
+    "priority": 4
+  }
+}

@@ -1,17 +1,19 @@
 package com.sevak_avet;
 
-import fsm.FiniteStateMachine;
-import fsm.FiniteStateMachineContext;
+import fsm.FSM;
+import fsm.FSMContext;
+import org.testng.annotations.Test;
 
 /**
  * Created by savetisyan on 11/10/16
  */
+@Test
 public abstract class BaseFSMTest {
-    protected FiniteStateMachine fsm;
+    protected FSM fsm;
 
     public BaseFSMTest(String fileName) {
-        String file = FiniteStateMachine.class.getResource(fileName).getFile();
-        FiniteStateMachineContext[] config = FiniteStateMachineContext.parse(file);
-        fsm = new FiniteStateMachine(config);
+        String file = FSM.class.getResource(fileName).getFile();
+        FSMContext[] config = FSMContext.parse(file);
+        fsm = new FSM(config);
     }
 }

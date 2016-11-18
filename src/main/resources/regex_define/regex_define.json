@@ -1,15 +1,33 @@
 {
-  "inputs": {
-    "digit": "x >= '0' && x <= '9'",
-    "char": "(x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z')",
-    "sign": "['>', '<', '!', '#', '+', '-', '*', '/', '&', '$', '@', '~'].indexOf(x) >= 0",
-    "whitespace": "x == '\\n' || x == '\\r' || x == '\\t' || x == ' '",
-    "ops": "['<' , '>' , '=' , '+' , '-' , '*' , '/'].indexOf(x) >= 0",
-    "int_sign": "x == '+' || x == '-'",
-    "exp": "x == 'e' || x == 'E'"
-  },
   "Keyword": {
-    "regex": "(begin, val, while, end, in, let, if, then, else)",
+    "regex": "(begin+val+while+end+in+let+if+then+else)",
     "priority": 2
+  },
+  "Boolean": {
+    "regex": "#(t+f)",
+    "priority": 2
+  },
+  "Integer": {
+    "regex": "(\\++-+\\$)\\d\\d*",
+    "priority": 2
+  },
+  "Id": {
+    "regex": "\\w(\\w+\\d+_+')*+\\r\\r*",
+    "priority": 2,
+    "inputs": {
+      "\\r": "['>', '<', '!', '#', '+', '-', '*', '/', '&', '$', '@', '~'].indexOf(x) >= 0"
+    }
+  },
+  "Operation": {
+    "regex": "<+>+=+\\++-+\\*+/+<>",
+    "priority": 3
+  },
+  "Whitespace": {
+    "regex": "\\s*",
+    "priority": 2
+  },
+  "Double": {
+    "regex": "(\\++-+\\$)((\\d\\d*.)+(.\\d\\d*)+(\\d\\d*.\\d\\d*)+(\\d\\d*))(\\e(\\++-)\\d\\d*+\\$)",
+    "priority": 3
   }
 }

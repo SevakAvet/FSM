@@ -21,7 +21,7 @@
   },
   "Operation": {
     "path": "/lexer/operation.json",
-    "priority": 1
+    "priority": 3
   },
   "Whitespace": {
     "path": "/lexer/whitespace.json",
