@@ -1,133 +1,264 @@
 package fsm;
 
-import javafx.util.Pair;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import util.Pair;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by savetisyan on 20/09/16
  */
 public class FSM {
-    private FSMContext[] configs;
+    private static final Gson GSON_GRAPH = new GsonBuilder()
+            .registerTypeAdapter(FSM.class, new ContextDeserializer())
+            .create();
 
-    private Set<String> currentStates;
-    private String start;
+    private static final ScriptEngine SCRIPT_ENGINE = new NashornScriptEngineFactory().getScriptEngine();
+    public static final Map<String, String> DEFAULT_INPUTS = new HashMap<>();
 
-    private int processed = 0;
-    private int maxSuccess = 0;
-    private boolean success = false;
-
-    public FSM(FSMContext config) {
-        this.configs = new FSMContext[]{config};
-        this.currentStates = new HashSet<>();
+    static {
+        DEFAULT_INPUTS.put("\\d", "x >= '0' && x <= '9'");
+        DEFAULT_INPUTS.put("\\w", "(x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z')");
+        DEFAULT_INPUTS.put("\\$", "x == ''");
+        DEFAULT_INPUTS.put("\\s", "x == ' ' || x == '\\n' || x == '\\r' || x == '\\t'");
+        DEFAULT_INPUTS.put("\\+", "x == '+'");
+        DEFAULT_INPUTS.put("\\*", "x == '*'");
+        DEFAULT_INPUTS.put("\\e", "x == 'e' || x == 'E'");
     }
 
-    public FSM(FSMContext config, String start) {
-        this(config);
-        this.start = start;
-        this.currentStates.add(start);
+    private final Map<String, String> inputs;
+    private Set<String> starts;
+    private Set<String> finishes;
+
+    // pair<from, by> -> set(to)
+    private Map<Pair<String, String>, Set<String>> charTransitions;
+    private Map<Pair<String, String>, Set<String>> functionTransitions;
+
+    public FSM() {
+        starts = new HashSet<>();
+        finishes = new HashSet<>();
+        inputs = new HashMap<>(DEFAULT_INPUTS);
+        charTransitions = new HashMap<>();
+        functionTransitions = new HashMap<>();
     }
 
-    public FSM(FSMContext[] configs) {
-        if (configs.length == 0) {
-            throw new IllegalArgumentException("Empty array of configs passed to constructor");
+    public void setStarts(Set<String> starts) {
+        this.starts = starts;
+    }
+
+    public void setFinishes(Set<String> finishes) {
+        this.finishes = finishes;
+    }
+
+    public void updateInputs(Map<String, String> inputs) {
+        if (inputs != null) {
+            this.inputs.putAll(inputs);
         }
-        this.configs = configs;
     }
 
-    public Pair<Integer, Boolean> max(String input) {
-        return max(input, 0);
+    public void setCharTransitions(Map<Pair<String, String>, Set<String>> charTransitions) {
+        this.charTransitions = charTransitions;
     }
 
-    public Pair<Integer, Boolean> max(String input, int skip) {
-        return Arrays.stream(configs).map(config ->
-                config.getStarts().stream()
-                        .map(start -> new FSM(config, start))
-                        .map(x -> x.feed(config, input, skip))
-                        .max(Comparator.comparing(Pair::getKey))
-                        .orElse(new Pair<>(0, false)))
-                .max(Comparator.comparing(Pair::getKey))
-                .orElse(new Pair<>(0, false));
+    public Map<Pair<String, String>, Set<String>> getFunctionTransitions() {
+        return functionTransitions;
     }
 
-    private Pair<Integer, Boolean> feed(FSMContext config, String input, int skip) {
-        for (int i = Math.min(skip, input.length()); i < input.length(); i++) {
-            feed(config, String.valueOf(input.charAt(i)));
+    public void setFunctionTransitions(Map<Pair<String, String>, Set<String>> functionTransitions) {
+        this.functionTransitions = functionTransitions;
+    }
+
+    public Set<String> getStarts() {
+        return starts;
+    }
+
+    public Set<String> getFinishes() {
+        return finishes;
+    }
+
+    public Map<String, String> getInputs() {
+        return inputs;
+    }
+
+    public Map<Pair<String, String>, Set<String>> getCharTransitions() {
+        return charTransitions;
+    }
+
+    public void addCharTransition(String from, Set<String> to, String by) {
+        addTransition(charTransitions, from, to, by);
+    }
+
+    public void addFunctionTransition(String from, Set<String> to, String by) {
+        addTransition(functionTransitions, from, to, by);
+    }
+
+    public void addCharTransition(String from, String to, String by) {
+        addTransition(charTransitions, from, to, by);
+    }
+
+    public void addFunctionTransition(String from, String to, String by) {
+        addTransition(functionTransitions, from, to, by);
+    }
+
+    private void addTransition(Map<Pair<String, String>, Set<String>> transition, String from, Set<String> to, String by) {
+        Pair<String, String> key = new Pair<>(from, by);
+        Set<String> toList = transition.getOrDefault(key, new HashSet<>());
+
+        if (toList.isEmpty()) {
+            transition.put(key, to);
+        } else {
+            toList.addAll(to);
+        }
+    }
+
+    private void addTransition(Map<Pair<String, String>, Set<String>> transition, String from, String to, String by) {
+        Pair<String, String> key = new Pair<>(from, by);
+        Set<String> toList = transition.getOrDefault(key, new HashSet<>());
+
+        if (toList.isEmpty()) {
+            toList.add(to);
+            transition.put(key, toList);
+        } else {
+            toList.add(to);
+        }
+    }
+
+    public static FSM[] parse(String fileName) {
+        try (FileReader json = new FileReader(fileName)) {
+            return GSON_GRAPH.fromJson(json, FSM[].class);
+        } catch (IOException e) {
+            return new FSM[0];
+        }
+    }
+
+    public Set<String> nextState(Pair<String, String> state) {
+        Set<String> nextStates = charTransitions.getOrDefault(state, Collections.emptySet());
+        if (!nextStates.isEmpty()) {
+            return nextStates;
         }
 
-        return maxSuccess != 0 ? new Pair<>(maxSuccess, true) : new Pair<>(0, false);
-    }
-
-    private void feed(FSMContext config, String input) {
-        Set<String> nextStates = currentStates.stream()
-                .map(state -> new Pair<>(state, input))
-                .flatMap(state -> config.nextState(state).stream())
-                .filter(states -> !states.isEmpty())
+        nextStates = functionTransitions.entrySet().stream()
+                .filter(x -> x.getKey().getKey().equals(state.getKey()))
+                .filter(x -> eval(state.getValue(), inputs.get(x.getKey().getValue())))
+                .flatMap(x -> x.getValue().stream())
                 .collect(Collectors.toSet());
 
-        if (!nextStates.isEmpty()) {
-            success = true;
-            processed++;
+        Set<String> nexts = functionTransitions.getOrDefault(emptyTransition(state), Collections.emptySet());
+        for (String next : nexts) {
+            nextStates.addAll(nextState(new Pair<>(next, state.getValue())));
+        }
+        return nextStates;
 
-            if (nextStates.stream().anyMatch(x -> config.getFinishes().contains(x))) {
-                maxSuccess = processed;
-            }
+    }
 
-            currentStates = nextStates;
-        } else {
-            currentStates.clear();
+    private Pair<String, String> emptyTransition(Pair<String, String> state) {
+        return Pair.of(state.getKey(), "\\$");
+    }
+
+    private boolean eval(String var, String expression) {
+        try {
+            SCRIPT_ENGINE.put("x", var);
+            return (Boolean) SCRIPT_ENGINE.eval(expression);
+        } catch (ScriptException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
-    public FSMContext[] getConfigs() {
-        return configs;
+    public void join(FSM fsm) {
+        this.getFinishes().addAll(fsm.getFinishes());
+
+        for (String originalStart : this.starts) {
+            fsm.getCharTransitions().forEach((k, v) -> {
+                if (fsm.getStarts().contains(k.getKey())) {
+                    this.addCharTransition(originalStart, v, k.getValue());
+                } else {
+                    this.addCharTransition(k.getKey(), v, k.getValue());
+                }
+            });
+
+            fsm.getFunctionTransitions().forEach((k, v) -> {
+                if (fsm.getStarts().contains(k.getKey())) {
+                    this.addFunctionTransition(originalStart, v, k.getValue());
+                } else {
+                    this.addFunctionTransition(k.getKey(), v, k.getValue());
+                }
+            });
+        }
     }
 
-    public int getMaxSuccess() {
-        return maxSuccess;
+    public void iterate() {
+        Map<Pair<String, String>, Set<String>> newCharTransitions = new HashMap<>();
+        Map<Pair<String, String>, Set<String>> newFunctionTransitions = new HashMap<>();
+
+        for (String finish : finishes) {
+            charTransitions.entrySet()
+                    .stream()
+                    .filter(x -> starts.contains(x.getKey().getKey()))
+                    .forEach(e -> addTransition(newCharTransitions, finish, e.getValue(), e.getKey().getValue()));
+            functionTransitions.entrySet()
+                    .stream()
+                    .filter(x -> starts.contains(x.getKey().getKey()))
+                    .forEach(e -> addTransition(newFunctionTransitions, finish, e.getValue(), e.getKey().getValue()));
+        }
+
+        finishes.addAll(starts);
+        charTransitions.putAll(newCharTransitions);
+        functionTransitions.putAll(newFunctionTransitions);
     }
 
-    public int getProcessed() {
-        return processed;
-    }
+    public void concat(FSM fsm, boolean isEmptyTransition) {
+        for (String start : fsm.getStarts()) {
+            fsm.getCharTransitions().forEach((k, v) -> {
+                String from = k.getKey();
+                String by = k.getValue();
+                if (from.equals(start)) {
+                    this.finishes.forEach(finish -> addCharTransition(finish, v, by));
+                } else {
+                    addCharTransition(from, v, by);
+                }
+            });
 
-    public boolean isSuccess() {
-        return success;
-    }
+            fsm.getFunctionTransitions().forEach((k, v) -> {
+                String from = k.getKey();
+                String by = k.getValue();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+                if (from.equals(start)) {
+                    this.finishes.forEach(finish -> addFunctionTransition(finish, v, by));
+                } else {
+                    addFunctionTransition(from, v, by);
+                }
+            });
+        }
 
-        FSM that = (FSM) o;
+        boolean startAndFinish = Stream.concat(fsm.getCharTransitions().keySet().stream(),
+                fsm.getFunctionTransitions().keySet().stream())
+                .anyMatch(x -> fsm.getStarts().contains(x.getKey())
+                        && fsm.getFinishes().contains(x.getKey()));
 
-        if (processed != that.processed) return false;
-        if (success != that.success) return false;
-        return currentStates.equals(that.currentStates);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = currentStates.hashCode();
-        result = 31 * result + processed;
-        result = 31 * result + (success ? 1 : 0);
-        return result;
+        if (startAndFinish || isEmptyTransition) {
+            finishes.addAll(fsm.getFinishes());
+        } else {
+            finishes = fsm.getFinishes();
+        }
+        finishes.removeAll(fsm.getStarts());
     }
 
     @Override
     public String toString() {
-        return "fsm.FiniteStateMachine{" +
-                "start='" + start + '\'' +
-                ", currentStates='" + currentStates + '\'' +
-                ", processed=" + processed +
-                ", success=" + success +
-                ", max_success=" + maxSuccess +
+        return "FiniteStateMachineConfig{" +
+                "starts=" + starts +
+                ", finishes=" + finishes +
+                ", inputs=" + inputs +
+                ", charTransitions=" + charTransitions +
+                ", functionTransition=" + functionTransitions +
                 '}';
     }
 }

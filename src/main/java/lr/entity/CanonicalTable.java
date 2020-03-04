@@ -4,7 +4,7 @@ import de.vandermeer.asciitable.v2.V2_AsciiTable;
 import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
 import de.vandermeer.asciitable.v2.render.WidthAbsoluteEven;
 import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
-import javafx.util.Pair;
+import util.Pair;
 import lr.Grammar;
 import lr.entity.CanonicalTable.Action.Type;
 
@@ -93,7 +93,7 @@ public class CanonicalTable {
 
         V2_AsciiTableRenderer rend = new V2_AsciiTableRenderer();
         rend.setTheme(V2_E_TableThemes.UTF_LIGHT.get());
-        rend.setWidth(new WidthAbsoluteEven(150));
+        rend.setWidth(new WidthAbsoluteEven(300));
         return rend.render(table).toString();
     }
 

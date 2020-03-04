@@ -1,7 +1,7 @@
 package fsm;
 
 import com.google.gson.*;
-import javafx.util.Pair;
+import util.Pair;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 /**
  * Created by savetisyan on 20/09/16
  */
-public class ContextDeserializer implements JsonDeserializer<FSMContext> {
+public class ContextDeserializer implements JsonDeserializer<FSM> {
 
     @Override
-    public FSMContext deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+    public FSM deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
         Set<String> start = context.deserialize(json.getAsJsonArray("start"), HashSet.class);
         Set<String> finish = context.deserialize(json.getAsJsonArray("finish"), HashSet.class);
@@ -26,10 +26,10 @@ public class ContextDeserializer implements JsonDeserializer<FSMContext> {
                 .flatMap(x -> x.getValue().entrySet().stream()
                         .map(y -> new Pair<>(new Pair<>(x.getKey(), y.getKey()), new HashSet<>(y.getValue()))))
                 .collect(Collectors.groupingBy(
-                        x -> inputs != null && inputs.keySet().contains(x.getKey().getValue()),
+                        x -> inputs != null && inputs.containsKey(x.getKey().getValue()),
                         Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-        FSMContext fsm = new FSMContext();
+        FSM fsm = new FSM();
         fsm.setStarts(start);
         fsm.setFinishes(finish);
         fsm.updateInputs(inputs);

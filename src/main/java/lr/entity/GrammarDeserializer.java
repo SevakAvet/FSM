@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Created by savetisyan on 23/10/16
  */
 public class GrammarDeserializer implements JsonDeserializer<Grammar> {
-    private Lexer lexer;
+    private final Lexer lexer;
 
     public GrammarDeserializer(Lexer lexer) {
         this.lexer = lexer;

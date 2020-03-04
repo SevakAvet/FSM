@@ -1,16 +1,16 @@
 package lexer.entity;
 
-import fsm.FSM;
+import fsm.FSMGroup;
 
 /**
  * Created by savetisyan on 11/10/16
  */
 public class Entry {
     private String className;
-    private FSM machine;
+    private FSMGroup machine;
     private int priority;
 
-    public Entry(String className, FSM machine, int priority) {
+    public Entry(String className, FSMGroup machine, int priority) {
         this.className = className;
         this.machine = machine;
         this.priority = priority;
@@ -24,11 +24,11 @@ public class Entry {
         this.className = className;
     }
 
-    public FSM getMachine() {
+    public FSMGroup getMachine() {
         return machine;
     }
 
-    public void setMachine(FSM machine) {
+    public void setMachine(FSMGroup machine) {
         this.machine = machine;
     }
 

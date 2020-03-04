@@ -7,6 +7,7 @@ import lexer.Lexer;
 import lexer.entity.Token;
 import lr.Grammar;
 import lr.LR1;
+import lr.Utils;
 import lr.entity.*;
 import org.apache.tools.ant.util.FileUtils;
 import org.testng.annotations.Test;
@@ -51,7 +52,7 @@ public class RegexGrammarTest {
 //        Utils.printCombinedItems(items);
 
         CanonicalTable canonicalTable = lr.getTable();
-        System.out.println(canonicalTable.prettyPrint());
+//        System.out.println(canonicalTable.prettyPrint());
 
         File inputFile = new File(Lexer.class.getResource("/lr/example3/input.txt").getFile());
         List<Token> input = lexer.tokenize(Files.readFile(inputFile))

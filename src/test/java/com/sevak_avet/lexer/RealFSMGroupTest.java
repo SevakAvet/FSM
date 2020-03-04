@@ -1,6 +1,6 @@
 package com.sevak_avet.lexer;
 
-import com.sevak_avet.BaseFSMTest;
+import com.sevak_avet.BaseFSMGroupTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -11,9 +11,9 @@ import static org.testng.Assert.assertTrue;
  * Created by savetisyan on 10/10/16
  */
 @Test
-public class RealFSMTest extends BaseFSMTest {
+public class RealFSMGroupTest extends BaseFSMGroupTest {
 
-    public RealFSMTest() {
+    public RealFSMGroupTest() {
         super("/lexer/real.json");
     }
 
@@ -59,11 +59,11 @@ public class RealFSMTest extends BaseFSMTest {
 
     @Test(dataProvider = "positiveDataProvider")
     public void testPositive(String input) throws Exception {
-        assertTrue(fsm.max(input).getKey() == input.length());
+        assertTrue(fsmGroup.max(input).getKey() == input.length());
     }
 
     @Test(dataProvider = "negativeDataProvider")
     public void testNegative(String input) throws Exception {
-        assertFalse(fsm.max(input).getKey() == input.length());
+        assertFalse(fsmGroup.max(input).getKey() == input.length());
     }
 }

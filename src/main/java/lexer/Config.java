@@ -17,7 +17,7 @@ public class Config {
             .registerTypeAdapter(Config.class, new ConfigDeserializer())
             .create();
 
-    private List<Entry> entries;
+    private final List<Entry> entries;
 
     public Config(List<Entry> entries) {
         this.entries = entries;

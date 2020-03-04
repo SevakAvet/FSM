@@ -6,20 +6,23 @@ import java.util.Map;
 /**
  * Created by savetisyan on 15/11/16
  */
-public class FSMGenerator {
+public class FSMRegex {
     private int curState = 0;
 
     private String genSym() {
         return String.format("%s%d", "S", curState++);
     }
 
-    public FSMContext parse(String str, Map<String, String> inputs) {
+    public FSM parse(String str, Map<String, String> inputs) {
         return parse(str, 0, str.length(), brackets(str), inputs);
     }
 
-    private FSMContext parse(String str, int startIndex, int endIndex,
-                             Map<Integer, Integer> brackets, Map<String, String> inputs) {
-        FSMContext fsm = new FSMContext();
+    private FSM parse(String str,
+                      int startIndex,
+                      int endIndex,
+                      Map<Integer, Integer> brackets,
+                      Map<String, String> inputs) {
+        FSM fsm = new FSM();
         String start = genSym();
         fsm.getStarts().add(start);
         fsm.getFinishes().add(start);
@@ -31,10 +34,9 @@ public class FSMGenerator {
             switch (str.charAt(i)) {
                 case '(':
                     int end = brackets.get(i);
-                    FSMContext curFsm = parse(str, i + 1, end, brackets, inputs);
+                    FSM curFsm = parse(str, i + 1, end, brackets, inputs);
                     if (end + 1 < endIndex && str.charAt(end + 1) == '*') {
                         curFsm.iterate();
-                        i++;
                     }
 
                     if (isEmpty) {
@@ -43,9 +45,7 @@ public class FSMGenerator {
                     } else {
                         boolean emptyTransition = curFsm.getFunctionTransitions().entrySet().stream()
                                 .filter(x -> curFsm.getStarts().contains(x.getKey().getKey()))
-                                .filter(x -> x.getKey().getValue().equals("\\$"))
-                                .findAny()
-                                .isPresent();
+                                .anyMatch(x -> x.getKey().getValue().equals("\\$"));
                         fsm.concat(curFsm, emptyTransition);
                     }
 
@@ -54,7 +54,7 @@ public class FSMGenerator {
                 case '\\':
                     if (i + 1 < endIndex) {
                         String function = "\\" + str.charAt(i + 1);
-                        if (!inputs.containsKey(function) && !FSMContext.DEFAULT_INPUTS.containsKey(function)) {
+                        if (!inputs.containsKey(function) && !FSM.DEFAULT_INPUTS.containsKey(function)) {
                             throw new IllegalArgumentException("Unknown function: " + function);
                         } else {
                             curFsm = oneSymbolAutomat(function, true);
@@ -76,7 +76,7 @@ public class FSMGenerator {
                     }
                     break;
                 case '+':
-                    FSMContext joinFsm = parse(str, i + 1, endIndex, brackets, inputs);
+                    FSM joinFsm = parse(str, i + 1, endIndex, brackets, inputs);
                     fsm.join(joinFsm);
                     i = endIndex;
                     break;
@@ -103,8 +103,8 @@ public class FSMGenerator {
     }
 
 
-    private FSMContext oneSymbolAutomat(String symbol, boolean isFunction) {
-        FSMContext fsm = new FSMContext();
+    private FSM oneSymbolAutomat(String symbol, boolean isFunction) {
+        FSM fsm = new FSM();
         String from = genSym();
         String to = genSym();
 
@@ -139,27 +139,32 @@ public class FSMGenerator {
 
         return brackets;
     }
-
     public void resetState() {
         this.curState = 0;
     }
 
     public static void main(String[] args) {
-        String regex = "(\\++-+\\$)(\\d\\d*.\\d\\d*)";
+        String regex = "(\\++-+\\$)(\\d\\d*(\\$+.\\d\\d*))";
         Map<String, String> inputs = new HashMap<>();
 
-        FSMContext parse = new FSMGenerator().parse(regex, inputs);
-        System.out.println(parse.getStarts() + " " + parse.getFinishes());
+        FSM parse = new FSMRegex().parse(regex, inputs);
+        System.out.println(parse.getStarts());
+        System.out.println(parse.getFinishes());
+        System.out.println(parse.getCharTransitions());
+        System.out.println(parse.getFunctionTransitions());
 
-        System.out.println();
-        parse.getCharTransitions().entrySet().stream()
-                .sorted((x, y) -> x.getKey().getKey().compareTo(y.getKey().getKey()))
-                .forEachOrdered(System.out::println);
-
-        System.out.println();
-        parse.getFunctionTransitions().entrySet().stream()
-                .sorted((x, y) -> x.getKey().getKey().compareTo(y.getKey().getKey()))
-                .forEachOrdered(System.out::println);
+        FSMGroup group = new FSMGroup(parse);
+        System.out.println(group.max("123")); // false, 0
+        System.out.println(group.max("123.")); // false, 0
+        System.out.println(group.max("12.3.")); // true, 4
+        System.out.println(group.max("123.1")); // true, 5
+        System.out.println(group.max("123.123")); // true, 7
+        System.out.println(group.max("+123.123")); // true, 8
+        System.out.println(group.max("-123.123")); // true, 8
+        System.out.println(group.max("a123.123")); // false, 0
+        System.out.println(group.max("a123.123", 1)); // true, 7
+        System.out.println(group.max("a123.123", 4)); // false, 0
+        System.out.println(group.max("a123.123", 5)); // false, 0
     }
 
 }

@@ -1,6 +1,6 @@
 package lexer;
 
-import javafx.util.Pair;
+import util.Pair;
 import lexer.Config;
 import lexer.entity.Entry;
 import lexer.entity.Token;
@@ -52,7 +52,7 @@ public class Lexer {
 
             Token token = results.stream()
                     .filter(x -> x.getValue().equals(max))
-                    .max((x, y) -> Integer.compare(x.getKey().getPriority(), y.getKey().getPriority()))
+                    .max(Comparator.comparingInt(x -> x.getKey().getPriority()))
                     .map(x -> new Token(
                             x.getKey().getClassName(),
                             input.substring(skip[0], skip[0] + x.getValue().getKey())

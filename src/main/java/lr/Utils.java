@@ -32,7 +32,7 @@ public abstract class Utils {
 
     public static void printCombinedItems(Set<Component> items) {
         ArrayList<Component> components = new ArrayList<>(items);
-        Collections.sort(components, (o1, o2) -> o1.getId().compareTo(o2.getId()));
+        components.sort(Comparator.comparing(Component::getId));
         components.forEach(x -> {
             Map<String, List<Item>> groups = x.getItems()
                     .stream()
@@ -41,10 +41,10 @@ public abstract class Utils {
             System.out.println("I" + x.getId() + "= {");
             groups.forEach((k, v) -> {
                 System.out.print("\t");
-                System.out.println(k + ", " + String.join("/", v.stream()
+                System.out.println(k + ", " + v.stream()
                         .map(Item::getLookahead)
                         .map(z -> z.replace("\n", "$"))
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.joining("/"))
                         + "]");
             });
             System.out.println("}");

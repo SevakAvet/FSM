@@ -1,6 +1,6 @@
 package com.sevak_avet;
 
-import javafx.util.Pair;
+import util.Pair;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -10,9 +10,9 @@ import static org.testng.Assert.assertTrue;
  * Created by savetisyan on 10/10/16
  */
 @Test
-public class FinalStringFSMTest extends BaseFSMTest {
+public class FinalStringFSMGroupTest extends BaseFSMGroupTest {
 
-    public FinalStringFSMTest() {
+    public FinalStringFSMGroupTest() {
         super("final_string.json");
     }
 
@@ -25,7 +25,7 @@ public class FinalStringFSMTest extends BaseFSMTest {
          * q2 -> null | 0
          * q4 -> q2 -> q2 -> null | 2
          */
-        Pair<Integer, Boolean> result = fsm.max("sevaksevak", 2);
+        Pair<Integer, Boolean> result = fsmGroup.max("sevaksevak", 2);
         System.out.printf("(%d, %b)\n", result.getKey(), result.getValue());
 
         assertTrue(result.getValue());
@@ -41,7 +41,7 @@ public class FinalStringFSMTest extends BaseFSMTest {
          * q2 -> null | 0
          * q4 -> q2 -> q2 -> null | 2
          */
-        Pair<Integer, Boolean> result = fsm.max("sevak", 2);
+        Pair<Integer, Boolean> result = fsmGroup.max("sevak", 2);
         System.out.printf("(%d, %b)\n", result.getKey(), result.getValue());
 
         assertTrue(result.getValue());

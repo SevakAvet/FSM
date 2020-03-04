@@ -12,7 +12,7 @@ import java.io.File;
 public class LexerTest {
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         String file = Lexer.class.getResource("/lexer/lexer.json").getFile();
 
         Config config = Config.parse(file);
